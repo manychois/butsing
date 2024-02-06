@@ -1,0 +1,20 @@
+{%- set htmlClasslist = ['h-full', 'bg-white'] -%}
+{%- set bodyClasslist = ['h-full'] -%}
+<!DOCTYPE html>
+<html lang="{{ htmlLang|default('en') }}" class="{{ htmlClasslist|join(' ') }}">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ htmlTitle }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% if htmlDescription %}
+      <meta name="description" content="{{ htmlDescription }}">
+    {% endif %}
+    <link rel="stylesheet" href="/assets/butsing.css?v={{random()}}">
+    <script defer src="/assets/ext-alpine.js?v={{random()}}"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" crossorigin="anonymous" integrity="sha512-hNPQBXPkQNVedvBobN0rdm9k7cYp+9hkfOWyePa+ml5wubn3kQTqGMokfQ/n8FrgRudUEODKlrnfjZEbxKnKFg=="></script>
+    {% block head %}{% endblock %}
+  </head>
+  <body class="{{ bodyClasslist|join(' ') }}"> {% block body %}{% endblock %}
+    </body>
+  </html>
