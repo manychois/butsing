@@ -1,0 +1,138 @@
+{% extends 'base.twig' %}
+
+{% set mainClasslist = mainClasslist|default('grow px-2 py-6 sm:px-6 overflow-y-auto') %}
+
+{% block body %}
+  <div class="flex flex-col h-full bg-white">
+
+    <nav class="bg-white border-b border-gray-200">
+      <div class="mx-auto px-2 sm:px-6">
+        <div class="relative flex h-12 justify-between">
+          <div class="pop-menu-container lg:hidden">
+            <button type="button" class="flex justify-center items-center rounded-full text-gray-600 hover:text-primary-500 h-12 w-12">
+              {{ hero_icon('bars-3', 'h-6 w-auto') }}
+            </button>
+            <div class="pop-menu top-12 -left-2 sm:-left-6 z-10 w-72 p-4 bg-white border-t border-gray-200 shadow">
+              <ul class="space-y-1">
+                {% for navItem in nav %}
+                  <li>
+                    {% if navItem.children %}
+                      <div class="rounded-md py-2 pr-2 pl-4 leading-6 text-sm font-semibold">{{ navItem.label }}</div>
+                      <ul>
+                        {% for subNavItem in navItem.children %}
+                          <li>
+                            {% if subNavItem.active %}
+                              <span class="bg-primary-500 block rounded-md py-2 pr-2 pl-8 leading-6 text-white">
+                                {{ subNavItem.label }}
+                              </span>
+                            {% else %}
+                              <a href="{{ subNavItem.href }}" class="hover:bg-primary-100 block rounded-md py-2 pr-2 pl-8 leading-6">
+                                {{ subNavItem.label }}
+                              </a>
+                            {% endif %}
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% else %}
+                      {% if navItem.active %}
+                        <span class="bg-primary-500 block rounded-md py-2 pr-2 pl-4 leading-6 font-semibold text-white">
+                          {{ navItem.label }}
+                        </span>
+                      {% else %}
+                        <a href="{{ navItem.href }}" class="hover:bg-primary-100 block rounded-md py-2 pr-2 pl-4 leading-6 font-semibold">
+                          {{ navItem.label }}
+                        </a>
+                      {% endif %}
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          <div class="flex flex-1 items-stretch justify-start gap-4">
+            <div class="flex flex-shrink-0 items-center">
+              <img class="h-8 w-auto" src="/assets/butsing.png" alt="Butsing">
+            </div>
+            <a href="/" class="flex items-center font-medium border-b-2 border-transparent hover:border-primary-500">
+              My website
+            </a>
+          </div>
+          <div class="pop-menu-container">
+            <button type="button" class="flex justify-center items-center rounded-full text-gray-600 hover:text-primary-500 h-12 w-12">
+              <span class="sr-only">Open user menu</span>
+              {{ hero_icon('user-circle', 'h-8 w-auto') }}
+            </button>
+            <div class="pop-menu top-12 -right-2 sm:-right-6 z-10 w-48 p-4 bg-white border-t border-gray-200 shadow">
+              <ul class="space-y-1">
+                <li>
+                  <a href="#" class="hover:bg-primary-100 block rounded-md py-2 pr-2 pl-4 leading-6 font-semibold">
+                    Your Profile
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="hover:bg-primary-100 block rounded-md py-2 pr-2 pl-4 leading-6 font-semibold">
+                    Settings
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="hover:bg-primary-100 block rounded-md py-2 pr-2 pl-4 leading-6 font-semibold">
+                    Sign out
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="flex grow">
+      <nav class="hidden shrink-0 lg:block w-72 border-r border-gray-200 p-6">
+        <ul role="list" class="-mx-2 space-y-1">
+          {% for navItem in nav %}
+            <li>
+              {% if navItem.children %}
+                {% set active = navItem.active ? 'true' : 'false' %}
+                <div x-data="{ active: {{ active }} }">
+                  <button type="button" class="hover:bg-primary-100 flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold" aria-controls="sub-menu-{{ loop.index }}" aria-expanded="{{ active }}" x-bind:aria-expanded="active" x-on:click="active = !active">
+                    {{ hero_icon('chevron-right', 'text-primary-500 h-5 w-5 shrink-0 transition-transform' ~ (navItem.active ? ' rotate-90' : ''), {'x-class:rotate-90': 'active'}) }}
+                    {{ navItem.label }}
+                  </button>
+                  <ul id="sub-menu-{{ loop.index }}" class="mt-1 px-2" x-show="active" x-collapse {% if not navItem.active %} style="display:none" {% endif %}>
+                    {% for subNavItem in navItem.children %}
+                      <li>
+                        {% if subNavItem.active %}
+                          <span class="bg-primary-500 block rounded-md py-2 pr-2 pl-9 text-sm leading-6 text-white">
+                            {{ subNavItem.label }}
+                          </span>
+                        {% else %}
+                          <a href="{{ subNavItem.href }}" class="hover:bg-primary-100 block rounded-md py-2 pr-2 pl-9 text-sm leading-6">
+                            {{ subNavItem.label }}
+                          </a>
+                        {% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              {% else %}
+                {% if navItem.active %}
+                  <span class="bg-primary-500 block rounded-md py-2 pr-2 pl-10 text-sm leading-6 font-semibold text-white">
+                    {{ navItem.label }}
+                  </span>
+                {% else %}
+                  <a href="{{ navItem.href }}" class="hover:bg-primary-100 block rounded-md py-2 pr-2 pl-10 text-sm leading-6 font-semibold">
+                    {{ navItem.label }}
+                  </a>
+                {% endif %}
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+
+      <main class="{{ mainClasslist }}">
+        {% block main %}{% endblock %}
+      </main>
+    </div>
+  </div>
+{% endblock %}

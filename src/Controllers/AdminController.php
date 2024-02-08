@@ -25,26 +25,39 @@ class AdminController
      */
     public function showDashboard(IRequest $request, IResponse $response, Environment $twig): IResponse
     {
-        $viewContext = [
-            'nav' => $this->getNav(),
-        ];
+        $viewContext = self::getViewContext($request);
 
         return ResponseHelper::twig($response, $twig, 'butsing-admin/dashboard.twig', $viewContext);
     }
 
     /**
+     * Returns the general view context.
+     *
+     * @param IRequest $request The incoming request.
+     *
+     * @return array<mixed> The general view context.
+     */
+    public static function getViewContext(IRequest $request): array
+    {
+        return [
+            'nav' => self::getNav($request),
+        ];
+    }
+
+    /**
      * Gets the navigation items.
+     *
+     * @param IRequest $request The incoming request.
      *
      * @return array<mixed> The navigation items.
      */
-    private function getNav(): array
+    private static function getNav(IRequest $request): array
     {
+        $path = $request->getUri()->getPath();
         $navs = [
             ['href' => '/butsing-admin/dashboard', 'label' => 'Dashboard'],
-            ['type' => 'group', 'id' => 'group1', 'label' => 'group1'],
-            ['href' => '#', 'label' => 'Group Item 1', 'group' => 'group1'],
-            ['href' => '#', 'label' => 'Group Item 2', 'group' => 'group1'],
-            ['href' => '#', 'label' => 'Group Item 3', 'group' => 'group1'],
+            ['type' => 'group', 'id' => 'composer', 'label' => 'Composer'],
+            ['href' => '/butsing-admin/composer/info', 'label' => 'Info', 'group' => 'composer'],
             ['type' => 'group', 'id' => 'group2', 'label' => 'group2'],
             ['href' => '#', 'label' => 'Group Item 4', 'group' => 'group2'],
             ['href' => '#', 'label' => 'Group Item 5', 'group' => 'group2'],
@@ -53,11 +66,12 @@ class AdminController
         ];
 
         for ($i = 0; $i < \count($navs); $i++) {
-            $navs[$i]['active'] = false;
+            if (($navs[$i]['href'] ?? '') === $path) {
+                $navs[$i]['active'] = true;
+            } else {
+                $navs[$i]['active'] = false;
+            }
         }
-        $navs[0]['active'] = true;
-        // $navs[1]['active'] = true;
-        // $navs[3]['active'] = true;
 
         $hierarchy = [];
         $groupLookup = [];
@@ -77,6 +91,21 @@ class AdminController
                 }
             } else {
                 $hierarchy[] = $nav;
+            }
+        }
+
+        foreach ($hierarchy as &$nav) {
+            if (isset($nav['children']) && \count($nav['children']) > 0) {
+                $active = false;
+                foreach ($nav['children'] as $child) {
+                    if ($child['active']) {
+                        $active = true;
+                        break;
+                    }
+                }
+                if ($active) {
+                    $nav['active'] = true;
+                }
             }
         }
 

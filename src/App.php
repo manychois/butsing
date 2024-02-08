@@ -12,6 +12,7 @@ use Manychois\Butsing\Core\EventDispatcher;
 use Manychois\Butsing\Core\ListenerProvider;
 use Manychois\Butsing\Core\PluginInterface;
 use Manychois\Butsing\Core\SessionInterface;
+use Manychois\PhpStrong\Collections\ArrayWrapper;
 use Manychois\PhpStrong\Preg\Regex;
 use Manychois\PhpStrong\StringUtility;
 use PDO;
@@ -32,10 +33,7 @@ use function DI\factory;
  */
 class App
 {
-    /**
-     * @var array<string, mixed>
-     */
-    private readonly array $appConfig;
+    private readonly ArrayWrapper $appConfig;
     private readonly ListenerProvider $listenerProvider;
     private readonly EventDispatcher $eventDispatcher;
     /**
@@ -51,7 +49,7 @@ class App
      */
     public function __construct(array $appConfig, array $pluginClasses = [])
     {
-        $this->appConfig = $appConfig;
+        $this->appConfig = new ArrayWrapper($appConfig);
         $this->listenerProvider = new ListenerProvider();
         $this->eventDispatcher = new EventDispatcher($this->listenerProvider);
         $this->pluginClasses = $pluginClasses;
@@ -91,12 +89,14 @@ class App
     protected function setupContainer(): Container
     {
         $cb = new ContainerBuilder();
+        $composeryHome = $this->appConfig->get('composery')->getString('home') ?? \sys_get_temp_dir() . '/composery';
         $cb->addDefinitions([
             Environment::class => factory(fn () => $this->setupTwig()),
             EventDispatcher::class => $this->eventDispatcher,
             ListenerProvider::class => $this->listenerProvider,
             PDO::class => factory(fn () => $this->setupPdo()),
             SessionInterface::class => create(Core\Implementations\Session::class),
+            \Manychois\Composery\App::class => factory(fn () => new \Manychois\Composery\App($composeryHome)),
         ]);
         foreach ($this->pluginClasses as $pluginClass) {
             if (\method_exists($pluginClass, 'addDefinitions')) {
@@ -114,12 +114,13 @@ class App
      */
     protected function setupPdo(): PDO
     {
-        /**
-         * @var array<string, string> $config
-         */
-        $config = $this->appConfig['pdo'];
-        $dsn = \sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4', $config['host'], $config['dbname']);
-        $pdo = new PDO($dsn, $config['username'], $config['password']);
+        $config = $this->appConfig->get('pdo');
+        $dsn = \sprintf(
+            'mysql:host=%s;dbname=%s;charset=utf8mb4',
+            $config->getString('host'),
+            $config->getString('dbname')
+        );
+        $pdo = new PDO($dsn, $config->getString('username'), $config->getString('password'));
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         return $pdo;
@@ -143,6 +144,7 @@ class App
         $auth = $container->get(AuthenticationMiddleware::class);
         $slim->group('/butsing-admin', function (RouteCollectorProxy $group) {
             $group->get('/dashboard', [Controllers\AdminController::class, 'showDashboard']);
+            $group->get('/composer/info', [Controllers\ComposerController::class, 'showInfo']);
         })->addMiddleware($auth);
 
         $afterRoutingSet = new Events\AfterRoutingSetEvent($slim);

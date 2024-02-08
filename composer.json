@@ -13,13 +13,14 @@
   ],
   "require": {
     "guzzlehttp/psr7": "^2.6",
+    "manychois/composery": "dev-main",
     "manychois/php-strong": "dev-main",
     "php-di/slim-bridge": "^3.4",
     "psr/event-dispatcher": "^1.0",
-    "slim/slim": "^4.12",
-    "twig/twig": "^3.8",
+    "psr/http-server-handler": "^1.0",
     "ramsey/uuid": "^4.7",
-    "psr/http-server-handler": "^1.0"
+    "slim/slim": "^4.12",
+    "twig/twig": "^3.8"
   },
   "require-dev": {
     "escapestudios/symfony2-coding-standard": "^3.13",

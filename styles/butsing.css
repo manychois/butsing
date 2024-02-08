@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  @variants responsive {
+    .text-start {
+      text-align: start;
+    }
+    .text-end {
+      text-align: end;
+    }
+  }
+}
+
+.pop-menu-container {
+  position: relative;
+
+  &:hover .pop-menu,
+  &:focus-within .pop-menu {
+    display: block;
+  }
+}
+
+.pop-menu {
+  display: none;
+  position: absolute;
+}

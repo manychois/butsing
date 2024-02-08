@@ -1,0 +1,59 @@
+{% extends 'butsing-admin/base.twig' %}
+
+{% set htmlTitle = 'Composer Info' %}
+
+{% block main %}
+  <h1 class="text-2xl md:text-4xl font-bold mb-6 text-primary-500">Composer Info</h1>
+  <table class="min-w-full divide-y divide-gray-300">
+    <thead>
+      <tr>
+        <th scope="col" class="p-2 font-semibold text-start">Name</th>
+        <th scope="col" class="hidden xl:table-cell p-2 font-semibold text-start">Version</th>
+        <th scope="col" class="p-2 font-semibold">Dependency</th>
+        <th scope="col" class="hidden lg:table-cell p-2 font-semibold text-start">Description</th>
+        <th scope="col" class="hidden sm:table-cell p-2 font-semibold text-start">External links</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for package in packages %}
+        {% set dependency = (package['direct-dependency'] ? 'Direct' : 'Indirect') ~ (package.abandoned ? ', Abandoned' : '') %}
+        <tr class="even:bg-gray-100">
+          <td class="p-2">
+            <span class="text-primary-500 xl:text-base whitespace-nowrap">{{ package.name }}</span>
+            <div class="text-xs font-mono whitespace-nowrap xl:hidden">
+              {{ package.version }}
+            </div>
+            <p class="text-xs mt-2 lg:hidden">
+              {{ package.description }}
+            </p>
+            {% if package.homepage or package.source %}
+              <div class="flex text-xs space-x-2 mt-2 sm:hidden">
+                {% if package.homepage %}
+                  <a href="{{ package.homepage }}" target="_blank" class="underline hover:text-primary-500">Homepage</a>
+                {% endif %}
+                {% if package.source %}
+                  <a href="{{ package.source }}" target="_blank" class="underline hover:text-primary-500">Source</a>
+                {% endif %}
+              </div>
+            {% endif %}
+          </td>
+          <td class="hidden xl:table-cell p-2 text-sm font-mono whitespace-nowrap">{{ package.version }}</td>
+          <td class="p-2 text-sm">
+            {{ dependency }}
+          </td>
+          <td class="hidden lg:table-cell p-2 text-sm">{{ package.description }}</td>
+          <td class="hidden sm:table-cell p-2 text-sm">
+            <div class="flex flex-col space-y-2">
+              {% if package.homepage %}
+                <a href="{{ package.homepage }}" target="_blank" class="underline hover:text-primary-500">Homepage</a>
+              {% endif %}
+              {% if package.source %}
+                <a href="{{ package.source }}" target="_blank" class="underline hover:text-primary-500">Source</a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

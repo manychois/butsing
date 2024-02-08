@@ -1,7 +1,7 @@
-{%- set htmlClasslist = ['h-full', 'bg-white'] -%}
-{%- set bodyClasslist = ['h-full'] -%}
+{%- set htmlClasslist = htmlClasslist|default('h-full bg-white') -%}
+{%- set bodyClasslist = bodyClasslist|default('h-full') -%}
 <!DOCTYPE html>
-<html lang="{{ htmlLang|default('en') }}" class="{{ htmlClasslist|join(' ') }}">
+<html lang="{{ htmlLang|default('en') }}" class="{{ htmlClasslist }}">
   <head>
     <meta charset="utf-8">
     <title>{{ htmlTitle }}</title>
@@ -15,6 +15,6 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" crossorigin="anonymous" integrity="sha512-hNPQBXPkQNVedvBobN0rdm9k7cYp+9hkfOWyePa+ml5wubn3kQTqGMokfQ/n8FrgRudUEODKlrnfjZEbxKnKFg=="></script>
     {% block head %}{% endblock %}
   </head>
-  <body class="{{ bodyClasslist|join(' ') }}"> {% block body %}{% endblock %}
-    </body>
-  </html>
+  <body class="{{ bodyClasslist }}"> {% block body %}{% endblock %}
+  </body>
+</html>
